@@ -24,6 +24,8 @@ class updateManager():
                     return False
             return True
         elif len(remote) <= len(local):
+            if remote == local:
+                return False
             for x in range(len(remote)):
                 if int(remote[x]) < int(local[x]):
                     return False
@@ -42,7 +44,7 @@ class updateManager():
     def check_remote_version(self):
         try:
             req = urllib.request.urlopen(self.url)
-            return req.read().decode()[:-1]
+            return req.read().decode()
         except urllib.error.HTTPError:
             print('ERROR: remote VERSION file not accessible')
             exit(1)

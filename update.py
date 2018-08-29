@@ -25,9 +25,9 @@ class updateManager():
             return True
         elif len(remote) <= len(local):
             for x in range(len(remote)):
-                if int(remote[x]) > int(local[x]):
-                    return True
-            return False
+                if int(remote[x]) < int(local[x]):
+                    return False
+            return True
 
     def create_version_file(self):
         if not os.path.isfile(self.filename):

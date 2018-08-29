@@ -368,7 +368,7 @@ class config(QtWidgets.QMainWindow):
         self.ui.new_conf.clicked.connect(self.newConfig)
         self.findFiles()
 
-        u = update.updateManager('https://github.com/danielyc/csb', '0.0')
+        u = update.updateManager('https://github.com/danielyc/csb', '3.0.1')
         if u.update:
             QtWidgets.QMessageBox.about(self, 'Update available', 'There is an update available, please download the latest version from the website.')
 

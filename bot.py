@@ -21,6 +21,15 @@ useConfig = False
 password = ''
 manualSize = True
 
+peu = {'Visa':'visa', 'American Express':'american_express', 'Mastercard':'master', 'Solo':'solo', 'Paypal':'paypal'}
+pasia = {'Visa':'visa', 'American Express':'american_express', 'Mastercard':'master', 'JCB':'jcb', '代金引換':'cod'}
+ceu = {'GB':'UK', 'UK (N. IRELAND)':'NB', 'AUSTRIA':'AT', 'BELARUS':'BY', 'BELGIUM':'BE', 'BULGARIA':'BG',
+        'CROATIA':'HR', 'CZECH REPUBLIC':'CZ', 'DENMARK':'DK', 'ESTONIA':'EE', 'FINLAND':'FI', 'FRANCE':'FR',
+        'GERMANY':'DE', 'GREECE':'GR', 'HUNGARY':'HU', 'ICELAND':'IS', 'IRELAND':'IE', 'ITALY':'IT',
+        'LATVIA':'LV', 'LITHUANIA':'LT', 'LUXEMBOURG':'LU', 'MONACO':'MC', 'NETHERLANDS':'NL', 'NORWAY':'NO',
+        'POLAND':'PL', 'PORTUGAL':'PT', 'ROMANIA':'RO', 'RUSSIA':'RU', 'SLOVAKIA':'SK', 'SLOVENIA':'SI',
+        'SPAIN':'ES', 'SWEDEN':'SE', 'SWITZERLAND':'CH', 'TURKEY':'TR'}
+
 def pause():
     clock.sleep(random())
 
@@ -41,20 +50,11 @@ def sendKeys(value, field, driver):
         return None
 
 
-#This function takes some time as it has to loop through but it is the only way it works
-#select by name does not work
-def selectText(value, obj):
+def selectValue(value, obj):
     try:
-        options = obj.options
-        i = 0
-        for x in options:
-            if x.text == value:
-                obj.select_by_index(i)
-                return
-            i += 1
-
+        obj.select_by_value(value)
     except WebDriverException:
-        return None
+        pass
 
 
 def getLoc(f):
@@ -91,15 +91,19 @@ def cart():
     add2 = check_exists_by_xpath("""//*[@id="oba3"]""", driver)
     sendKeys(paydetails['Addr2'], add2, driver)
 
-    country = Select(driver.find_element_by_name("order[billing_country]"))
-    selectText(paydetails['Country'], country)
+    if reg != 'ASIA':
+        country = Select(driver.find_element_by_name("order[billing_country]"))
+    if reg == 'EU':
+        selectValue(ceu[paydetails['Country']], country)
+    elif reg == 'US':
+        selectValue(paydetails['Country'], country)
 
     if reg == 'EU':
         add3 = check_exists_by_xpath("""//*[@id="order_billing_address_3"]""", driver)
         sendKeys(paydetails['Addr3'], add3, driver)
     elif reg == 'US':
         state = Select(driver.find_element_by_name("order[billing_state]"))
-        selectText(paydetails['Addr3'], state)
+        selectValue(paydetails['Addr3'], state)
 
     city = check_exists_by_xpath("""//*[@id="order_billing_city"]""", driver)
     sendKeys(paydetails['City'], city, driver)
@@ -107,11 +111,11 @@ def cart():
     postcode = check_exists_by_xpath("""//*[@id="order_billing_zip"]""", driver)
     sendKeys(paydetails['Post/zip code'], postcode, driver)
 
-    if reg == 'EU':
+    if reg == 'EU' or reg == 'ASIA':
         cardType = Select(driver.find_element_by_id("credit_card_type"))
-        selectText(paydetails['CardType'].lower(), cardType)
+        cardType.select_by_visible_text(paydetails['CardType'])
 
-    if paydetails['CardType'].lower() != 'paypal':
+    if paydetails['CardType'].lower() != 'paypal' or paydetails['CardType'] != '代金引換':
         if reg == 'EU':
             cardno = check_exists_by_xpath("""//*[@id="cnb"]""", driver)
         elif reg == 'US':
@@ -125,10 +129,10 @@ def cart():
         sendKeys(paydetails['CardCVV'], cvv, driver)
 
         expiraryDate1 = Select(driver.find_element_by_name("credit_card[month]"))
-        selectText(paydetails['CardMonth'], expiraryDate1)
+        selectValue(paydetails['CardMonth'], expiraryDate1)
 
         expiraryDate2 = Select(driver.find_element_by_name("credit_card[year]"))
-        selectText(paydetails['CardYear'], expiraryDate2)
+        selectValue(paydetails['CardYear'], expiraryDate2)
 
     tickBox = driver.find_element_by_xpath("""//*[@id="cart-cc"]/fieldset/p/label/div/ins""")
     tickBox.click()

@@ -43,9 +43,9 @@ class itemSel(QtWidgets.QMainWindow):
         global service, capabilities
         chromePath = readPath()
         if sys.platform == 'win32':
-            service = services.Service(getLoc('chromedriver.exe'))
+            service = services.Service('chromedriver.exe')
         elif sys.platform == 'posix':
-            service = services.Service(getLoc('chromedriver'))
+            service = services.Service('chromedriver')
         capabilities = {'chrome.binary': chromePath}
 
         QtWidgets.QWidget.__init__(self)
@@ -100,7 +100,7 @@ class itemSel(QtWidgets.QMainWindow):
         bot.openChrome(paydetails, itemdets, time, self.strictItemSelect, service, capabilities)
 
     def removeItem(self):
-        if self.ui.item_list.currentRow():
+        if self.ui.item_list.currentRow() != -1:
             self.ui.item_list.takeItem(self.ui.item_list.currentRow())
             self.warnStatus('Item removed')
         else:
@@ -208,7 +208,7 @@ class paydet(QtWidgets.QMainWindow):
                 self.ui.addr3_dropdown.addItem(x)
 
     def checkcc(self):
-        if self.ui.payment_type.currentText() == 'Paypal' or self.ui.payment_type.currentText() == '代金引換':
+        if self.ui.payment_type.currentText() == 'PayPal' or self.ui.payment_type.currentText() == '代金引換':
             self.ui.cc_num.setEnabled(False)
             self.ui.cc_cvv.setEnabled(False)
             self.ui.cc_month.setEnabled(False)
@@ -310,7 +310,7 @@ class paydet(QtWidgets.QMainWindow):
 
     def updateRegion(self):
         global sus, sca
-        peu = {'Visa':'visa', 'American Express':'american_express', 'Mastercard':'master', 'Solo':'solo', 'Paypal':'paypal'}
+        peu = {'Visa':'visa', 'American Express':'american_express', 'Mastercard':'master', 'Solo':'solo', 'PayPal':'paypal'}
         ceu = {'GB':'UK', 'UK (N. IRELAND)':'NB', 'AUSTRIA':'AT', 'BELARUS':'BY', 'BELGIUM':'BE', 'BULGARIA':'BG',
                'CROATIA':'HR', 'CZECH REPUBLIC':'CZ', 'DENMARK':'DK', 'ESTONIA':'EE', 'FINLAND':'FI', 'FRANCE':'FR',
                'GERMANY':'DE', 'GREECE':'GR', 'HUNGARY':'HU', 'ICELAND':'IS', 'IRELAND':'IE', 'ITALY':'IT',
@@ -372,9 +372,10 @@ class config(QtWidgets.QMainWindow):
         self.ui.donate.setOpenExternalLinks(True)
         self.ui.use_conf.clicked.connect(self.useConfig)
         self.ui.new_conf.clicked.connect(self.newConfig)
+        self.ui.ASIA_btn.setEnabled(False)
         self.findFiles()
 
-        u = update.updateManager('https://github.com/danielyc/csb', '3.0.2')
+        u = update.updateManager('https://github.com/danielyc/csb', '3.0.3')
         if u.update:
             QtWidgets.QMessageBox.about(self, 'Update available', 'There is an update available, please download the latest version from the website.')
 
@@ -405,10 +406,13 @@ class config(QtWidgets.QMainWindow):
         global REGION
         if self.ui.EU_btn.isChecked():
             REGION = 'EU'
+            bot.reg = 'EU'
         elif self.ui.US_btn.isChecked():
             REGION = 'US'
+            bot.reg = 'US'
         elif self.ui.ASIA_btn.isChecked():
             REGION = 'ASIA'
+            bot.reg = 'ASIA'
         else:
             self.updateStatus('No region selected')
             return None

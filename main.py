@@ -15,8 +15,12 @@ itemdetails = OrderedDict(
 
 
 def getLoc(f):
-    loc = os.getcwd()
-    return loc + '/' + f
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, f)
 
 
 def readPath():
@@ -45,8 +49,9 @@ class itemSel(QtWidgets.QMainWindow):
         capabilities = {'chrome.binary': chromePath}
 
         QtWidgets.QWidget.__init__(self)
-        self.ui = uic.loadUi('GUIS/itemConfig.ui', self)
-        self.setWindowIcon(QtGui.QIcon('GUIS/icon.png'))
+        self.ui = uic.loadUi(getLoc('GUIS/itemConfig.ui'), self)
+        self.setWindowIcon(QtGui.QIcon(getLoc('GUIS/icon.png')))
+        self.label.setPixmap(QtGui.QPixmap(getLoc('GUIS/title.png')))
         self.strictItemSelect = True
         self.populateDropdowns()
         self.ui.category.currentIndexChanged.connect(self.updateFields)
@@ -162,8 +167,9 @@ class itemSel(QtWidgets.QMainWindow):
 class paydet(QtWidgets.QMainWindow):
     def __init__(self):
         QtWidgets.QWidget.__init__(self)
-        self.ui = uic.loadUi('GUIS/PDConfig.ui', self)
-        self.setWindowIcon(QtGui.QIcon('GUIS/icon.png'))
+        self.ui = uic.loadUi(getLoc('GUIS/PDConfig.ui'), self)
+        self.setWindowIcon(QtGui.QIcon(getLoc('GUIS/icon.png')))
+        self.logo.setPixmap(QtGui.QPixmap(getLoc('GUIS/title.png')))
         self.cc = True
         self.updateRegion()
         self.populateCC()
@@ -217,7 +223,7 @@ class paydet(QtWidgets.QMainWindow):
 
     def cont(self):
         if self.checkFields():
-            itemSelection()
+            itemSelection(True)
 
     def saveConfig(self):
         if self.checkFields(True):
@@ -228,7 +234,7 @@ class paydet(QtWidgets.QMainWindow):
             enc.password = self.ui.password.text().encode('utf-8')
             for x in paydetails:
                 enc.writeToConf(x, paydetails[x], new)
-            itemSelection()
+            itemSelection(True)
 
     def checkFields(self, safe=False):
         if len(self.ui.full_name.text()) == 0:
@@ -358,17 +364,17 @@ class paydet(QtWidgets.QMainWindow):
 class config(QtWidgets.QMainWindow):
     def __init__(self):
         QtWidgets.QWidget.__init__(self)
-        self.ui = uic.loadUi('GUIS/SelectConfig.ui', self)
-        self.setWindowIcon(QtGui.QIcon('GUIS/icon.png'))
-        self.ui.label.setText('<a href="http://www.csb.center"><img src="GUIS/title.png"></a>')
+        self.ui = uic.loadUi(getLoc('GUIS/SelectConfig.ui'), self)
+        self.setWindowIcon(QtGui.QIcon(getLoc('GUIS/icon.png')))
+        self.ui.label.setText('<a href="http://www.csb.center"><img src="' + getLoc('GUIS/title.png') + '"></a>')
         self.ui.label.setOpenExternalLinks(True)
-        self.ui.donate.setText('<a href="https://www.paypal.me/supportcsb"><img src="GUIS/donate.png"></a>')
+        self.ui.donate.setText('<a href="https://www.paypal.me/supportcsb"><img src="' + getLoc('GUIS/donate.png') + '"></a>')
         self.ui.donate.setOpenExternalLinks(True)
         self.ui.use_conf.clicked.connect(self.useConfig)
         self.ui.new_conf.clicked.connect(self.newConfig)
         self.findFiles()
 
-        u = update.updateManager('https://github.com/danielyc/csb', '3.0.1')
+        u = update.updateManager('https://github.com/danielyc/csb', '3.0.2')
         if u.update:
             QtWidgets.QMessageBox.about(self, 'Update available', 'There is an update available, please download the latest version from the website.')
 
@@ -438,8 +444,11 @@ class config(QtWidgets.QMainWindow):
             return None
 
 
-def itemSelection():
-    c.close()
+def itemSelection(cont=False):
+    if cont:
+        p.close()
+    else:
+        c.close()
     i = itemSel()
     i.show()
 

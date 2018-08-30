@@ -35,7 +35,7 @@ You can get in contact with us by emailing info@csb.center.
 6. If you have downloaded the binary version of CSB, then you are done now with the installation and you can skip to step 9. If you have downloaded the source files then read along.
 7. Make sure you have installed the latest version of python for your operating system.
 8. Install the required python libraries using `pip install -r requirements.txt`.
-9. Run main.py or csb.exe. If there is an update available then there will be a popup.
+9. Run **main.py**, **main.exe** or on Mac open a terminal window and drag **main** into it and press enter. If there is an update available then there will be a popup.
 10. Choose the region you are located in. If you live in Canada pick “US”. The “ASIA” option refers to Japan only as this is the only place where Supreme ships to within Asia. Then click on “New config”. If you already have a configuration file then select it from the dropdown menu and input the password.
 11. If you chose to make a new configuration file a window will show where you can enter all of your payment and shipping details.
 12. This is where you enter all of the shipping and billing details. You have the option of saving this info in a local .cnf file which will be stored within the same directory. This information is encrypted and can only be decrypted with your personal password. If you would like to save this information for multiple uses, enter a password within the password field and also a save name. The .cnf file will be named whatever you enter in the save name field. Click the button “Save config” to save this information or click “Continue” to proceed unsaved.

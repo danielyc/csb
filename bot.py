@@ -208,7 +208,7 @@ def searchItem(item):
                     found = True
                     break
             if found:
-                selectText(item['selectedSize'], size)
+                selectValue(item['selectedSize'], size)
             elif manualSize:
                 print('\nSELECTED SIZE NOT FOUND/AVAILABLE MANUAL SELECT\n')
                 clock.sleep(3)

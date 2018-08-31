@@ -288,7 +288,7 @@ class paydet(QtWidgets.QMainWindow):
         else:
             paydetails['Addr2'] = 'None'
         if len(self.ui.addr_3.text()) > 0 and REGION == 'EU':
-            if self.ui.addr_3.tex() > 0:
+            if self.ui.addr_3.text() > 0:
                 paydetails['Addr3'] = self.ui.addr_3.text()
             else:
                 paydetails['Addr3'] = 'None'

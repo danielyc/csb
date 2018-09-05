@@ -30,13 +30,16 @@ ceu = {'GB':'UK', 'UK (N. IRELAND)':'NB', 'AUSTRIA':'AT', 'BELARUS':'BY', 'BELGI
         'POLAND':'PL', 'PORTUGAL':'PT', 'ROMANIA':'RO', 'RUSSIA':'RU', 'SLOVAKIA':'SK', 'SLOVENIA':'SI',
         'SPAIN':'ES', 'SWEDEN':'SE', 'SWITZERLAND':'CH', 'TURKEY':'TR'}
 
+class Found(Exception):
+    pass
+
+
 def pause():
     clock.sleep(random())
 
 def check_exists_by_xpath(xpath, driver):
     try:
-        myElem = WebDriverWait(driver, 1).until(EC.presence_of_element_located((By.XPATH, xpath)))
-        return driver.find_element_by_xpath(xpath)
+        return driver.find_element_by_id(xpath[9:-2])
     except NoSuchElementException:
         myElem = WebDriverWait(driver, 1).until(EC.presence_of_element_located((By.XPATH, xpath)))
         return driver.find_element_by_xpath(xpath)
@@ -113,7 +116,10 @@ def cart():
 
     if reg == 'EU' or reg == 'ASIA':
         cardType = Select(driver.find_element_by_id("credit_card_type"))
-        cardType.select_by_visible_text(paydetails['CardType'])
+        if reg == 'EU':
+            selectValue(peu[paydetails['CardType']], cardType)
+        else:
+            selectValue(pasia[paydetails['cardType']], cardType)
 
     if paydetails['CardType'].lower() != 'paypal' or paydetails['CardType'] != '代金引換':
         if reg == 'EU':
@@ -134,10 +140,10 @@ def cart():
         expiraryDate2 = Select(driver.find_element_by_name("credit_card[year]"))
         selectValue(paydetails['CardYear'], expiraryDate2)
 
-    tickBox = driver.find_element_by_xpath("""//*[@id="cart-cc"]/fieldset/p/label/div/ins""")
-    tickBox.click()
+    tickBox = driver.find_elements_by_class_name('iCheck-helper')
+    tickBox[1].click()
 
-    complete = check_exists_by_xpath("""//*[@id="pay"]/input""", driver)
+    complete = driver.find_element_by_name('commit')
     complete.click()
 
 
@@ -146,57 +152,52 @@ def searchItem(item):
     url += item['selectedCategory']
     driver.get(url)
 
-    while True:
-        matchedClothes = []
-        checkedListings = []
-        for x in range(5, 1):
+    try:
+        while True:
+            bestMatch = [0, 0, 0]
             driver.get(url)
 
-        listings = driver.find_elements_by_class_name("name-link")
-        for i in range(0, len(listings), 1):
-            if i % 2 != 0:
-                text = listings[i - 1].text
-                split = text.strip()
-                matches = 0
-                colour = 0
-                for keyword in item['keywords']:
-                    if keyword.encode('ascii', 'ignore') in split.encode('ascii', 'ignore'):
-                        matches += 1
-                try:
-                    coloura = listings[i].text
-                    if item['selectedColour'].encode('ascii', 'ignore') in coloura.encode('ascii', 'ignore'):
-                        colour = 1
-                except AttributeError:
+            listings = driver.find_elements_by_class_name("name-link")
+            leng = len(listings)
+            for i in range(0, leng):
+                if i % 2 == 0:
+                    text = listings[i].text
+                    split = text.strip()
+                    matches = 0
                     colour = 0
-                if matches != 0:
-                    matches += colour
-                writeLog([item['keywords'], item['selectedColour'], split, item['selectedColour'], coloura, matches, len(item['keywords']) + 1])
-                checkedListings.append(matches)
-                matchedClothes.append(matches)
+                    for keyword in item['keywords']:
+                        if keyword.encode('ascii', 'ignore') in split.encode('ascii', 'ignore'):
+                            matches += 1
+                    try:
+                        lcolour = listings[i+1].text
+                        if item['selectedColour'].encode('ascii', 'ignore') in lcolour.encode('ascii', 'ignore'):
+                            colour = 1
+                    except AttributeError:
+                        colour = 0
+                    writeLog([item['keywords'], item['selectedColour'], split, item['selectedColour'], lcolour, matches,
+                              colour, len(item['keywords']) + colour])
+                    if len(item['keywords']) == matches and strict:
+                        if item['selectedColour'] != '' and colour == 1:
+                            listings[i].click()
+                            raise Found
+                        elif item['selectedColour'] == '' and colour == 0:
+                            listings[i].click()
+                            raise Found
+                    if bestMatch[0] <= matches and colour >= bestMatch[1]:
+                        bestMatch[0] = matches
+                        bestMatch[1] = colour
+                        bestMatch[2] = i
+            if not strict:
+                break
 
-        largestMatch = 0
-        for i in range(0, len(checkedListings), 1):
-            if checkedListings[i] > largestMatch:
-                largestMatch = checkedListings[i]
-        if item['selectedColour'] != '' and largestMatch == len(item['keywords']) + 1:
-            break
-        elif item['selectedColour'] == '' and largestMatch == len(item['keywords']):
-            break
-        elif not strict:
-            break
-
-    selectedIndex = 0
-    for i in range(0, len(matchedClothes), 1):
-        if largestMatch == matchedClothes[i]:
-            selectedIndex = i * 2
-            writeLog(selectedIndex)
-
-    listings[selectedIndex].click()
+        listings[bestMatch[2]].click()
+    except Found:
+        pass
 
     clock.sleep(0.5+random())
 
     try:
-        if item['selectedSize'] != '':
+        if item['selectedSize'] != 'First available':
             if reg == 'EU':
                 size = Select(driver.find_element_by_id("size"))
             elif reg == 'US':
@@ -236,10 +237,20 @@ def returnTime():
             break
 
 
+def openTab(url, driver):
+    m = driver.current_window_handle
+    try:
+        driver.execute_script('''window.open("{0}","_blank")'''.format(url))
+    except WebDriverException:
+        pass
+    driver.switch_to.window(m)
+
+
 def openChrome(paydetailsO, itemdetsO, timeO, strictO, service, capabilities):
     global driver, strict, password, reg, items, droptime, pDescr, paydetails, category
     service.start()
     driver = webdriver.Remote(service.service_url, capabilities)
+    openTab('https://www.google.com', driver)
     paydetails = paydetailsO
     reg = paydetailsO['Region']
     strict = strictO

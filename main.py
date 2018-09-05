@@ -286,12 +286,12 @@ class paydet(QtWidgets.QMainWindow):
         if len(self.ui.addr_2.text()) > 0:
             paydetails['Addr2'] = self.ui.addr_2.text()
         else:
-            paydetails['Addr2'] = 'None'
+            paydetails['Addr2'] = ''
         if len(self.ui.addr_3.text()) > 0 and REGION == 'EU':
-            if self.ui.addr_3.text() > 0:
+            if len(self.ui.addr_3.text()) > 0:
                 paydetails['Addr3'] = self.ui.addr_3.text()
             else:
-                paydetails['Addr3'] = 'None'
+                paydetails['Addr3'] = ''
         elif REGION == 'US' or REGION == 'ASIA':
             paydetails['Addr3'] = self.ui.addr3_dropdown.currentText()
 
@@ -375,7 +375,7 @@ class config(QtWidgets.QMainWindow):
         self.ui.ASIA_btn.setEnabled(False)
         self.findFiles()
 
-        u = update.updateManager('https://github.com/danielyc/csb', '3.0.4')
+        u = update.updateManager('https://github.com/danielyc/csb', '3.0.5')
         if u.update:
             QtWidgets.QMessageBox.about(self, 'Update available', 'There is an update available, please download the latest version from the website.')
 

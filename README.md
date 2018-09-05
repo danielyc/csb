@@ -21,6 +21,8 @@ Currently for CSB V3.0 we have not reached full automation. While the bot will a
 CSB operates under GNU AGPLv3. You are free to use the tool however you want. As long as it is compliant with the licence.
 #### What OS (Operating Systems) is CSB compatible with?
 As of now, windows 7 through 10 and MacOS
+#### Chrome and/or my antivirus blocked the file. Is the code malicious?
+Much to our frustration, CSB is being flagged by some antivirus software. The code is not malicious in anyway at all and can be viewed within the GitHub. Please add main.exe as an exception with your respective antivirus software.
 #### Can I help with the production of CSB?
 At the moment we are not looking for any new members to join the team. Currently, the project is not big enough for multiple people to work on it without causing greater inconveniences. This being said, you can still help us by emailing us crash reports to info@csb.center or open bugreports on the github page.
 #### How can I get in contact with the CSB team?

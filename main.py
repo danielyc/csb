@@ -27,7 +27,7 @@ def readPath():
     if sys.platform == 'win32':
         if os.path.isfile('C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'):
             return 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'
-    elif sys.platform == 'posix':
+    elif sys.platform == 'darwin':
         if os.path.isfile('/Applications/Google Chrome.app'):
             return '/Applications/Google Chrome.app'
     elif os.path.isfile('chromepath.txt'):
@@ -44,8 +44,8 @@ class itemSel(QtWidgets.QMainWindow):
         chromePath = readPath()
         if sys.platform == 'win32':
             service = services.Service('chromedriver.exe')
-        elif sys.platform == 'posix':
-            service = services.Service('chromedriver')
+        elif sys.platform == 'darwin':
+            service = services.Service('./chromedriver')
         capabilities = {'chrome.binary': chromePath}
 
         QtWidgets.QWidget.__init__(self)
@@ -375,7 +375,7 @@ class config(QtWidgets.QMainWindow):
         self.ui.ASIA_btn.setEnabled(False)
         self.findFiles()
 
-        u = update.updateManager('https://github.com/danielyc/csb', '3.0.5')
+        u = update.updateManager('https://github.com/danielyc/csb', '3.0.6')
         if u.update:
             QtWidgets.QMessageBox.about(self, 'Update available', 'There is an update available, please download the latest version from the website.')
 

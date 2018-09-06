@@ -223,6 +223,7 @@ class paydet(QtWidgets.QMainWindow):
 
     def cont(self):
         if self.checkFields():
+            self.populatePdet()
             itemSelection(True)
 
     def saveConfig(self):
@@ -375,7 +376,7 @@ class config(QtWidgets.QMainWindow):
         self.ui.ASIA_btn.setEnabled(False)
         self.findFiles()
 
-        u = update.updateManager('https://github.com/danielyc/csb', '3.0.6')
+        u = update.updateManager('https://github.com/danielyc/csb', '3.0.7')
         if u.update:
             QtWidgets.QMessageBox.about(self, 'Update available', 'There is an update available, please download the latest version from the website.')
 

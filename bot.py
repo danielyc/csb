@@ -61,10 +61,8 @@ def selectValue(value, obj):
 
 
 def getLoc(f):
-    loc = os.path.dirname(__file__)
-    if len(loc) < 1:
-        return f
-    return loc + '\\' + f
+    base_path = os.path.abspath(".")
+    return os.path.join(base_path, f)
 
 
 def writeLog(txt):
@@ -170,7 +168,7 @@ def searchItem(item):
                             matches += 1
                     try:
                         lcolour = listings[i+1].text
-                        if item['selectedColour'].encode('ascii', 'ignore') in lcolour.encode('ascii', 'ignore'):
+                        if lcolour.encode('ascii', 'ignore') in item['selectedColour'].encode('ascii', 'ignore'):
                             colour = 1
                     except AttributeError:
                         colour = 0
@@ -197,7 +195,7 @@ def searchItem(item):
     clock.sleep(0.5+random())
 
     try:
-        if item['selectedSize'] != 'First available':
+        if item['selectedSize'] != 'First available' and item['selectedSize'] != '':
             if reg == 'EU':
                 size = Select(driver.find_element_by_id("size"))
             elif reg == 'US':
@@ -223,7 +221,6 @@ def searchItem(item):
         print("Sorry the item is sold out!")
         return None
     pause()
-
 
 def returnTime():
     timeInput = droptime.split(":")

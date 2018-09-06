@@ -22,7 +22,6 @@ def getLoc(f):
 
     return os.path.join(base_path, f)
 
-
 def readPath():
     if sys.platform == 'win32':
         if os.path.isfile('C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'):
@@ -107,21 +106,22 @@ class itemSel(QtWidgets.QMainWindow):
             self.updateStatus('No item selected')
 
     def addItem(self):
+        self.clearStatus()
         if len(self.ui.keywords.text()) == 0:
             self.updateStatus('No keywords specified')
             return None
         if len(self.ui.colour.text()) == 0:
-            self.updateStatus('No ' + self.ui.colour_text.text()[:-1].lower() + ' specified')
-            return None
+            self.warnStatus('No ' + self.ui.colour_text.text()[:-1].lower() + ' specified')
         if len(self.ui.size.text()) == 0 and self.ui.size.isEnabled():
             self.warnStatus('First available size selected')
+        if len(self.ui.size.text()) == 0 and self.ui.size.isEnabled() and len(self.ui.colour.text()) == 0:
+            self.warnStatus('First available size/' + self.ui.colour_text.text()[:-1].lower() + ' selected')
         if self.ui.size.isEnabled():
             self.ui.item_list.addItem(str([self.ui.category.currentText(), self.ui.keywords.text(),
                                            self.ui.colour.text().title(), self.ui.size.text()]))
         elif self.ui.size_drop.isEnabled():
             self.ui.item_list.addItem(str([self.ui.category.currentText(), self.ui.keywords.text(),
                                            self.ui.colour.text().title(), self.ui.size_drop.currentText()]))
-        self.clearStatus()
 
     def updateFields(self):
         sizes = ['Small','Medium','Large','XLarge', 'First available']
@@ -376,7 +376,7 @@ class config(QtWidgets.QMainWindow):
         self.ui.ASIA_btn.setEnabled(False)
         self.findFiles()
 
-        u = update.updateManager('https://github.com/danielyc/csb', '3.0.7')
+        u = update.updateManager('https://github.com/danielyc/csb', '3.0.8')
         if u.update:
             QtWidgets.QMessageBox.about(self, 'Update available', 'There is an update available, please download the latest version from the website.')
 

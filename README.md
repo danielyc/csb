@@ -58,7 +58,7 @@ You can get in contact with us by emailing info@csb.center.
 20. After completing the Captcha, assuming your pay details and billing information is correct, you should be finished. Please let us know how the experience was by emailing us at info@csb.center
 
 #### pyinstaller command to compile your own binaries
-`pyinstaller --hidden-inport=PyQt5.sip --icon=GUIS/icon.png --onefile main.py`
+`pyinstaller --hidden-inport=PyQt5.sip --icon=GUIS/icon.png --add-data=GUIS:GUIS --onefile main.py`
 
 If CSB worked as intended or you want to support the project, you can donate at https://www.paypal.me/supportcsb. Any amount is appreciated and we will add your name if you wish to the donor list which will be included on a later version
 Thanks!

@@ -22,7 +22,7 @@ useConfig = False
 password = ''
 manualSize = True
 
-peu = {'Visa':'visa', 'American Express':'american_express', 'Mastercard':'master', 'Solo':'solo', 'Paypal':'paypal'}
+peu = {'Visa':'visa', 'American Express':'american_express', 'Mastercard':'master', 'Solo':'solo', 'PayPal':'paypal'}
 pasia = {'Visa':'visa', 'American Express':'american_express', 'Mastercard':'master', 'JCB':'jcb', '代金引換':'cod'}
 ceu = {'GB':'UK', 'UK (N. IRELAND)':'NB', 'AUSTRIA':'AT', 'BELARUS':'BY', 'BELGIUM':'BE', 'BULGARIA':'BG',
         'CROATIA':'HR', 'CZECH REPUBLIC':'CZ', 'DENMARK':'DK', 'ESTONIA':'EE', 'FINLAND':'FI', 'FRANCE':'FR',

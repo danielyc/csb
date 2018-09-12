@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets, uic, QtGui
+from PyQt5 import QtWidgets, uic, QtGui, QtCore
 from collections import OrderedDict
 import sys, os, ast, bot, update
 import encrypt as enc
@@ -39,7 +39,9 @@ def readPath():
 
 class itemSel(QtWidgets.QMainWindow):
     def __init__(self):
-        global service, capabilities
+        global service, capabilities, newProxy
+        self.useProxy = False
+        newProxy = proxy()
         chromePath = readPath()
         if sys.platform == 'win32':
             service = services.Service('chromedriver.exe')
@@ -52,6 +54,9 @@ class itemSel(QtWidgets.QMainWindow):
         self.setWindowIcon(QtGui.QIcon(getLoc('GUIS/icon.png')))
         self.label.setPixmap(QtGui.QPixmap(getLoc('GUIS/title.png')))
         self.strictItemSelect = True
+        p = self.palette()
+        p.setColor(self.backgroundRole(), QtCore.Qt.white)
+        self.setPalette(p)
         self.populateDropdowns()
         self.ui.category.currentIndexChanged.connect(self.updateFields)
         self.ui.add_item.clicked.connect(self.addItem)
@@ -62,18 +67,40 @@ class itemSel(QtWidgets.QMainWindow):
         self.menubar.setStyleSheet("QMenuBar::item::selected { background-color: rgb(200, 200, 200);}"
                                    "QMenuBar { background-color: rgb(226, 226, 226);}")
         optMenu = self.menubar.addMenu('Options')
+        proxyMenu = self.menubar.addMenu('Proxy')
+        self.useProxyS = QtWidgets.QAction("Use proxy", self, checkable=True)
+        changeProxy = QtWidgets.QAction("Proxy Settings", self, checkable=False)
+        changeProxy.triggered.connect(self.openProxy)
+        self.useProxyS.triggered.connect(self.setProxy)
+        proxyMenu.addAction(self.useProxyS)
+        proxyMenu.addAction(changeProxy)
         strictAct = QtWidgets.QAction('Strict item selection', self, checkable=True)
         strictAct.triggered.connect(self.strict)
         strictAct.setChecked(True)
         optMenu.addAction(strictAct)
+
+    def setProxy(self):
+        self.useProxy = not self.useProxy
+
+    def openProxy(self):
+        newProxy.show()
+
+    def populateTime(self, strict):
+        self.ui.time.clear()
+        if strict:
+            for x in range(0, 24):
+                self.ui.time.addItem(str(x).zfill(2) + ':00')
+                self.ui.time.addItem(str(x).zfill(2) + ':59')
+        else:
+            for x in range(0, 24):
+                self.ui.time.addItem(str(x).zfill(2) + ':00')
 
     def populateDropdowns(self):
         cats = ['jackets','shirts','tops_sweaters','sweatshirts','pants','shorts','t-shirts','hats','bags','accessories',
                 'skate','shoes']
         for x in cats:
             self.ui.category.addItem(x)
-        for x in range(0, 25):
-            self.ui.time.addItem(str(x).zfill(2)+':00')
+        self.populateTime(True)
 
     def updateStatus(self, text):
         self.ui.status.setStyleSheet('color: RED')
@@ -89,6 +116,7 @@ class itemSel(QtWidgets.QMainWindow):
 
     def strict(self):
         self.strictItemSelect = not self.strictItemSelect
+        self.populateTime(self.strictItemSelect)
 
     def go(self):
         itemdets = []
@@ -96,7 +124,7 @@ class itemSel(QtWidgets.QMainWindow):
             text = ast.literal_eval(self.ui.item_list.item(x).text())
             itemdets.append(text)
         time = self.ui.time.currentText()
-        bot.openChrome(paydetails, itemdets, time, self.strictItemSelect, service, capabilities)
+        bot.openChrome(paydetails, itemdets, time, self.strictItemSelect, service, capabilities, self.useProxy, newProxy.selected_ip)
 
     def removeItem(self):
         if self.ui.item_list.currentRow() != -1:
@@ -171,6 +199,9 @@ class paydet(QtWidgets.QMainWindow):
         self.setWindowIcon(QtGui.QIcon(getLoc('GUIS/icon.png')))
         self.logo.setPixmap(QtGui.QPixmap(getLoc('GUIS/title.png')))
         self.cc = True
+        p = self.palette()
+        p.setColor(self.backgroundRole(), QtCore.Qt.white)
+        self.setPalette(p)
         self.updateRegion()
         self.populateCC()
         self.ui.continue_btn.clicked.connect(self.cont)
@@ -371,12 +402,15 @@ class config(QtWidgets.QMainWindow):
         self.ui.label.setOpenExternalLinks(True)
         self.ui.donate.setText('<a href="https://www.paypal.me/supportcsb"><img src="' + getLoc('GUIS/donate.png') + '"></a>')
         self.ui.donate.setOpenExternalLinks(True)
+        p = self.palette()
+        p.setColor(self.backgroundRole(), QtCore.Qt.white)
+        self.setPalette(p)
         self.ui.use_conf.clicked.connect(self.useConfig)
         self.ui.new_conf.clicked.connect(self.newConfig)
         self.ui.ASIA_btn.setEnabled(False)
         self.findFiles()
 
-        u = update.updateManager('https://github.com/danielyc/csb', '3.0.8')
+        u = update.updateManager('https://github.com/danielyc/csb', '3.0.9')
         if u.update:
             QtWidgets.QMessageBox.about(self, 'Update available', 'There is an update available, please download the latest version from the website.')
 
@@ -447,6 +481,28 @@ class config(QtWidgets.QMainWindow):
         else:
             self.updateStatus('No password specified')
             return None
+
+class proxy(QtWidgets.QMainWindow):
+    def __init__(self):
+        QtWidgets.QWidget.__init__(self)
+        self.ui = uic.loadUi(getLoc('GUIS/IPConfig.ui'), self)
+        self.setWindowIcon(QtGui.QIcon(getLoc('GUIS/icon.png')))
+        self.selected_ip = ""
+        self.ui.ipinput.setText(self.selected_ip)
+        self.ui.continue_ip.clicked.connect(self.setIP)
+        self.ui.default_ip.clicked.connect(self.resetIP)
+
+    def setIP(self):
+        ip = self.ui.ipinput.text()
+        port = self.ui.portinput.text()
+        if port != "" and ip :
+            endParam = ip + ":" + port
+            self.selected_ip = endParam
+        self.close()
+
+    def resetIP(self):
+        self.ui.ipinput.setText("")
+        self.ui.portinput.setText("")
 
 
 def itemSelection(cont=False):

@@ -5,6 +5,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import WebDriverException
+from selenium.webdriver.common.proxy import Proxy, ProxyType
 from selenium import webdriver
 import datetime
 import time as clock
@@ -172,7 +173,7 @@ def searchItem(item):
                             colour = 1
                     except AttributeError:
                         colour = 0
-                    writeLog([item['keywords'], item['selectedColour'], split, item['selectedColour'], lcolour, matches,
+                    writeLog([item['keywords'], item['selectedColour'], split, lcolour, matches,
                               colour, len(item['keywords']) + colour])
                     if len(item['keywords']) == matches and strict:
                         if item['selectedColour'] != '' and colour == 1:
@@ -224,12 +225,15 @@ def searchItem(item):
 
 def returnTime():
     timeInput = droptime.split(":")
-    isTime = timeInput[0]
+    tarHour = timeInput[0]
+    tarMin = timeInput[1]
     while True:
         ts = clock.time()
         houra = datetime.fromtimestamp(ts).strftime('%H')
+        minuta = datetime.fromtimestamp(ts).strftime('%M')
         hour = int(houra)
-        if str(hour) >= isTime:
+        minut = int(minuta)
+        if (str(hour) >= tarHour and tarMin == '00') or (str(hour) == tarHour and str(minut) == tarMin):
             clock.sleep(1)
             break
 
@@ -243,10 +247,25 @@ def openTab(url, driver):
     driver.switch_to.window(m)
 
 
-def openChrome(paydetailsO, itemdetsO, timeO, strictO, service, capabilities):
+def openChrome(paydetailsO, itemdetsO, timeO, strictO, service, capabilities, useProxy, PROXY):
     global driver, strict, password, reg, items, droptime, pDescr, paydetails, category
     service.start()
-    driver = webdriver.Remote(service.service_url, capabilities)
+    chrome_options = webdriver.ChromeOptions()
+    if useProxy:
+        prx = Proxy()
+        prx.proxy_type = ProxyType.MANUAL
+        prx.http_proxy = PROXY
+        prx.socks_proxy = PROXY
+        prx.ssl_proxy = PROXY
+        prx.add_to_capabilities(capabilities)
+    else:
+        prx = Proxy()
+        prx.proxy_type = ProxyType.SYSTEM
+        prx.add_to_capabilities(capabilities)
+
+    chrome_options.binary_location = capabilities['chrome.binary']
+
+    driver = webdriver.Chrome(desired_capabilities=capabilities)
     openTab('https://www.google.com', driver)
     paydetails = paydetailsO
     reg = paydetailsO['Region']
@@ -257,6 +276,10 @@ def openChrome(paydetailsO, itemdetsO, timeO, strictO, service, capabilities):
         print(x[0],x[1],x[2],x[3])
         items.append({'selectedCategory': x[0], 'keywords': x[1].split(','), 'selectedColour': x[2], 'selectedSize': x[3]})
     returnTime()
-    for it in items:
-        searchItem(it)
-    cart()
+    try:
+        for it in items:
+                searchItem(it)
+        cart()
+    except (WebDriverException, AttributeError):
+        print('[!] Chrome window closed. Click GO! to re-start')
+        return None

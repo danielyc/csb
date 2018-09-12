@@ -25,6 +25,9 @@
   <property name="windowTitle">
    <string>Payment details</string>
   </property>
+  <property name="autoFillBackground">
+   <bool>true</bool>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QLabel" name="logo">
     <property name="geometry">

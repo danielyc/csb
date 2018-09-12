@@ -25,6 +25,9 @@
   <property name="windowTitle">
    <string>Item selection</string>
   </property>
+  <property name="autoFillBackground">
+   <bool>true</bool>
+  </property>
   <property name="inputMethodHints">
    <set>Qt::ImhDigitsOnly</set>
   </property>

@@ -62,4 +62,8 @@ You can get in contact with us by emailing info@csb.center.
 
 If CSB worked as intended or you want to support the project, you can donate at https://www.paypal.me/supportcsb. Any amount is appreciated and we will add your name if you wish to the donor list which will be included on a later version
 Thanks!
+
 -HA6Bots and Danielyc
+
+Credits:
+- *red_arma* from reddit for the new graphical design.

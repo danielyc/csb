@@ -21,7 +21,7 @@ Currently for CSB V3.0 we have not reached full automation. While the bot will a
 #### What is the licencing for CSB?
 CSB operates under GNU AGPLv3. You are free to use the tool however you want. As long as it is compliant with the licence.
 #### What OS (Operating Systems) is CSB compatible with?
-As of now, windows 7 through 10 and MacOS
+As of now, Windows 7 through 10, MacOS and Linux.
 #### Chrome and/or my antivirus blocked the file. Is the code malicious?
 Much to our frustration, CSB is being flagged by some antivirus software. The code is not malicious in anyway at all and can be viewed within the GitHub. Please add main.exe as an exception with your respective antivirus software.
 #### Can I help with the production of CSB?
@@ -32,8 +32,8 @@ You can get in contact with us by emailing info@csb.center.
 1. Download the CSB binary or the zipfile from the website
 - http://csb.center
 2. Open the downloaded zip file and drag and drop the containing folder ‘CSB’ onto your desktop or where you would like to store the bot.
-3. Download chromedriver from http://chromedriver.chromium.org/downloads, make sure you download the right version if you are using Mac or Windows. Place chromedriver in your CSB folder.
-4. Ensure that google chrome is downloaded and installed on your device. You can download chrome from https://www.google.com/chrome/.
+3. Download chromedriver from http://chromedriver.chromium.org/downloads, make sure you download the right version if you are using Mac, Windows or Linux. Place chromedriver in your CSB folder.
+4. Ensure that Google Chrome (or Chromium if you're using Linux) is downloaded and installed on your device. You can download chrome from https://www.google.com/chrome/.
 5. If Chrome it not installed into the default location, make a text file named 'chromepath.txt' in the CSB folder with the path to the Chrome executable
 6. If you have downloaded the binary version of CSB, then you are done now with the installation and you can skip to step 9. If you have downloaded the source files then read along.
 7. Make sure you have installed the latest version of python for your operating system.

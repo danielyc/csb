@@ -67,3 +67,4 @@ Thanks!
 
 Credits:
 - *red_arma* from reddit for the new graphical design.
+- *Ludoboii* from github for the linux support

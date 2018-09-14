@@ -29,6 +29,9 @@ def readPath():
     elif sys.platform == 'darwin':
         if os.path.isfile('/Applications/Google Chrome.app'):
             return '/Applications/Google Chrome.app'
+    elif sys.platform == 'linux':
+        if os.path.isfile('/usr/bin/chromium-browser'):
+            return '/usr/bin/chromium-browser'
     elif os.path.isfile('chromepath.txt'):
         f = open(getLoc("chromepath.txt"), "r").readlines()
         makeitastring = ''.join(map(str, f))
@@ -47,10 +50,14 @@ class itemSel(QtWidgets.QMainWindow):
             service = services.Service('chromedriver.exe')
         elif sys.platform == 'darwin':
             service = services.Service('./chromedriver')
+        elif sys.platform == 'linux':
+            service = services.Service('./chromedriver')
         capabilities = {'chrome.binary': chromePath}
 
         QtWidgets.QWidget.__init__(self)
-        self.ui = uic.loadUi(getLoc('GUIS/itemConfig.ui'), self)
+        # changed 'GUIS/itemConfig.ui' to 'GUIS/ItemConfig.ui' as this would make the
+        # file impossible to find on Linux
+        self.ui = uic.loadUi(getLoc('GUIS/ItemConfig.ui'), self)
         self.setWindowIcon(QtGui.QIcon(getLoc('GUIS/icon.png')))
         self.label.setPixmap(QtGui.QPixmap(getLoc('GUIS/title.png')))
         self.strictItemSelect = True

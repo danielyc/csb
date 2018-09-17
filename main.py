@@ -47,16 +47,14 @@ class itemSel(QtWidgets.QMainWindow):
         newProxy = proxy()
         chromePath = readPath()
         if sys.platform == 'win32':
-            service = services.Service('chromedriver.exe')
+            service = 'chromedriver.exe'
         elif sys.platform == 'darwin':
-            service = services.Service('./chromedriver')
+            service = './chromedriver'
         elif sys.platform == 'linux':
-            service = services.Service('./chromedriver')
+            service = './chromedriver'
         capabilities = {'chrome.binary': chromePath}
 
         QtWidgets.QWidget.__init__(self)
-        # changed 'GUIS/itemConfig.ui' to 'GUIS/ItemConfig.ui' as this would make the
-        # file impossible to find on Linux
         self.ui = uic.loadUi(getLoc('GUIS/ItemConfig.ui'), self)
         self.setWindowIcon(QtGui.QIcon(getLoc('GUIS/icon.png')))
         self.label.setPixmap(QtGui.QPixmap(getLoc('GUIS/title.png')))
@@ -92,22 +90,11 @@ class itemSel(QtWidgets.QMainWindow):
     def openProxy(self):
         newProxy.show()
 
-    def populateTime(self, strict):
-        self.ui.time.clear()
-        if strict:
-            for x in range(0, 24):
-                self.ui.time.addItem(str(x).zfill(2) + ':00')
-                self.ui.time.addItem(str(x).zfill(2) + ':59')
-        else:
-            for x in range(0, 24):
-                self.ui.time.addItem(str(x).zfill(2) + ':00')
-
     def populateDropdowns(self):
         cats = ['jackets','shirts','tops_sweaters','sweatshirts','pants','shorts','t-shirts','hats','bags','accessories',
                 'skate','shoes']
         for x in cats:
             self.ui.category.addItem(x)
-        self.populateTime(True)
 
     def updateStatus(self, text):
         self.ui.status.setStyleSheet('color: RED')
@@ -123,14 +110,13 @@ class itemSel(QtWidgets.QMainWindow):
 
     def strict(self):
         self.strictItemSelect = not self.strictItemSelect
-        self.populateTime(self.strictItemSelect)
 
     def go(self):
         itemdets = []
         for x in range(0, len(self.ui.item_list)):
             text = ast.literal_eval(self.ui.item_list.item(x).text())
             itemdets.append(text)
-        time = self.ui.time.currentText()
+        time = self.ui.time.time().toString()
         bot.openChrome(paydetails, itemdets, time, self.strictItemSelect, service, capabilities, self.useProxy, newProxy.selected_ip)
 
     def removeItem(self):
@@ -417,7 +403,7 @@ class config(QtWidgets.QMainWindow):
         self.ui.ASIA_btn.setEnabled(False)
         self.findFiles()
 
-        u = update.updateManager('https://github.com/danielyc/csb', '3.0.10')
+        u = update.updateManager('https://github.com/danielyc/csb', '3.0.11')
         if u.update:
             QtWidgets.QMessageBox.about(self, 'Update available', 'There is an update available, please download the latest version from the website.')
 

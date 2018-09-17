@@ -345,51 +345,29 @@
      <string>GO!</string>
     </property>
    </widget>
-   <widget class="QComboBox" name="time">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>400</y>
-      <width>291</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="minimumSize">
-     <size>
-      <width>291</width>
-      <height>25</height>
-     </size>
-    </property>
-    <property name="maximumSize">
-     <size>
-      <width>291</width>
-      <height>25</height>
-     </size>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_10">
     <property name="geometry">
      <rect>
       <x>50</x>
       <y>380</y>
-      <width>151</width>
+      <width>291</width>
       <height>19</height>
      </rect>
     </property>
     <property name="minimumSize">
      <size>
-      <width>151</width>
+      <width>291</width>
       <height>19</height>
      </size>
     </property>
     <property name="maximumSize">
      <size>
-      <width>151</width>
+      <width>291</width>
       <height>19</height>
      </size>
     </property>
     <property name="text">
-     <string>Time of drop:</string>
+     <string>Time of drop (hour and minute, second):</string>
     </property>
    </widget>
    <widget class="QLabel" name="size_text">
@@ -464,6 +442,38 @@
      </size>
     </property>
    </widget>
+   <widget class="QTimeEdit" name="time">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>410</y>
+      <width>291</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>291</width>
+      <height>25</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>291</width>
+      <height>25</height>
+     </size>
+    </property>
+    <property name="displayFormat">
+     <string>HH:mm:ss</string>
+    </property>
+    <property name="time">
+     <time>
+      <hour>0</hour>
+      <minute>0</minute>
+      <second>0</second>
+     </time>
+    </property>
+   </widget>
   </widget>
   <action name="actionStrict_item_selection">
    <property name="text">
@@ -481,7 +491,6 @@
   <tabstop>delete_item</tabstop>
   <tabstop>item_list</tabstop>
   <tabstop>start</tabstop>
-  <tabstop>time</tabstop>
  </tabstops>
  <resources>
   <include location="../window/Pictures/logo.qrc"/>

@@ -1,15 +1,21 @@
-import urllib.request, urllib.error, os.path
+import urllib.request, urllib.error, os.path, sys
 
 
 class updateManager():
-    def __init__(self, url, version, filename='VERSION', debug=False):
+    def __init__(self, url, version, filename='VERSION'):
         self.url = url.replace('github', 'raw.githubusercontent') + '/master/' + filename
         self.version = version
         self.filename = filename
         self.create_version_file()
         self.update_local_file()
+        self.update = False
+        self.update_check()
+
+    def update_check(self):
+        if getattr(sys, 'frozen', False) and sys.platform == 'darwin':
+            os.environ['SSL_CERT_FILE'] = os.path.join(sys._MEIPASS, 'lib', 'cert.pem')
+
         if self.check_for_update(self.check_remote_version(), self.check_local_version()):
-            if debug: print('UPDATE FOUND')
             self.update = True
         else:
             self.update = False

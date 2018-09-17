@@ -225,15 +225,15 @@ def searchItem(item):
 
 def returnTime():
     timeInput = droptime.split(":")
-    tarHour = timeInput[0]
-    tarMin = timeInput[1]
+    tarHour = int(timeInput[0])
+    tarMin = int(timeInput[1])
+    tarSec = int(timeInput[2])
+    target = datetime.now()
+    target = target.replace(hour=tarHour, minute=tarMin, second=tarSec)
+
     while True:
-        ts = clock.time()
-        houra = datetime.fromtimestamp(ts).strftime('%H')
-        minuta = datetime.fromtimestamp(ts).strftime('%M')
-        hour = int(houra)
-        minut = int(minuta)
-        if (str(hour) >= tarHour and tarMin == '00') or (str(hour) == tarHour and str(minut) == tarMin):
+        cur = datetime.now()
+        if cur >= target:
             clock.sleep(1)
             break
 
@@ -247,9 +247,8 @@ def openTab(url, driver):
     driver.switch_to.window(m)
 
 
-def openChrome(paydetailsO, itemdetsO, timeO, strictO, service, capabilities, useProxy, PROXY):
+def openChrome(paydetailsO, itemdetsO, timeO, strictO, cdloc, capabilities, useProxy, PROXY):
     global driver, strict, password, reg, items, droptime, pDescr, paydetails, category
-    service.start()
     chrome_options = webdriver.ChromeOptions()
     if useProxy:
         prx = Proxy()
@@ -265,7 +264,7 @@ def openChrome(paydetailsO, itemdetsO, timeO, strictO, service, capabilities, us
 
     chrome_options.binary_location = capabilities['chrome.binary']
 
-    driver = webdriver.Chrome(desired_capabilities=capabilities)
+    driver = webdriver.Chrome(cdloc, desired_capabilities=capabilities)
     openTab('https://www.google.com', driver)
     paydetails = paydetailsO
     reg = paydetailsO['Region']

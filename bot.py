@@ -1,5 +1,7 @@
 import os.path
 from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchWindowException
+from selenium.common.exceptions import ElementNotVisibleException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
@@ -20,7 +22,6 @@ matchedClothes = []
 LOGFILE = True
 useConfig = False
 password = ''
-manualSize = True
 
 peu = {'Visa':'visa', 'American Express':'american_express', 'Mastercard':'master', 'Solo':'solo', 'PayPal':'paypal'}
 pasia = {'Visa':'visa', 'American Express':'american_express', 'Mastercard':'master', 'JCB':'jcb', '代金引換':'cod'}
@@ -35,8 +36,8 @@ class Found(Exception):
     pass
 
 
-def pause():
-    clock.sleep(random())
+def pause(offset):
+    clock.sleep(offset+random())
 
 def check_exists_by_xpath(xpath, driver):
     try:
@@ -75,8 +76,14 @@ def writeLog(txt):
 
 
 def cart():
-    cart = driver.find_elements_by_class_name('checkout')[0]
-    cart.click()
+    cartp = check_exists_by_xpath("""//*[@id="cart"]""", driver)
+    while True:
+        cart = cartp.find_elements_by_class_name('checkout')[0]
+        try:
+            cart.click()
+            break
+        except ElementNotVisibleException:
+            pass
 
     name = check_exists_by_xpath("""//*[@id="order_billing_name"]""", driver)
     sendKeys(paydetails['Name'], name, driver)
@@ -193,7 +200,7 @@ def searchItem(item):
     except Found:
         pass
 
-    clock.sleep(0.5+random())
+    pause(0.5)
 
     try:
         if item['selectedSize'] != 'First available' and item['selectedSize'] != '':
@@ -209,19 +216,25 @@ def searchItem(item):
                     break
             if found:
                 selectValue(item['selectedSize'], size)
-            elif manualSize:
-                print('\nSELECTED SIZE NOT FOUND/AVAILABLE MANUAL SELECT\n')
-                clock.sleep(3)
+                add = driver.find_element_by_xpath("""//*[@id="add-remove-buttons"]/input""")
+                add.click()
+            elif nextS:
+                add = driver.find_element_by_xpath("""//*[@id="add-remove-buttons"]/input""")
+                add.click()
+            elif skipS:
+                pass
             else:
                 print("Sorry the item size is sold out!")
                 return None
+        else:
+            add = driver.find_element_by_xpath("""//*[@id="add-remove-buttons"]/input""")
+            add.click()
 
-        add = driver.find_element_by_xpath("""//*[@id="add-remove-buttons"]/input""")
-        add.click()
+
     except NoSuchElementException:
-        print("Sorry the item is sold out!")
-        return None
-    pause()
+        if not skipS:
+            print("Sorry the item is sold out!")
+            return None
 
 def returnTime():
     timeInput = droptime.split(":")
@@ -247,8 +260,8 @@ def openTab(url, driver):
     driver.switch_to.window(m)
 
 
-def openChrome(paydetailsO, itemdetsO, timeO, strictO, cdloc, capabilities, useProxy, PROXY):
-    global driver, strict, password, reg, items, droptime, pDescr, paydetails, category
+def openChrome(paydetailsO, itemdetsO, timeO, strictO, skipO, nextO, cdloc, capabilities, useProxy, PROXY):
+    global driver, strict, password, reg, items, droptime, pDescr, paydetails, category, skipS, nextS
     chrome_options = webdriver.ChromeOptions()
     if useProxy:
         prx = Proxy()
@@ -269,6 +282,8 @@ def openChrome(paydetailsO, itemdetsO, timeO, strictO, cdloc, capabilities, useP
     paydetails = paydetailsO
     reg = paydetailsO['Region']
     strict = strictO
+    skipS = skipO
+    nextS = nextO
     droptime = timeO
     items = []
     for x in itemdetsO:
@@ -279,6 +294,6 @@ def openChrome(paydetailsO, itemdetsO, timeO, strictO, cdloc, capabilities, useP
         for it in items:
                 searchItem(it)
         cart()
-    except (WebDriverException, AttributeError):
+    except NoSuchWindowException:
         print('[!] Chrome window closed. Click GO! to re-start')
         return None

@@ -2,7 +2,6 @@ from PyQt5 import QtWidgets, uic, QtGui, QtCore
 from collections import OrderedDict
 import sys, os, ast, bot, update
 import encrypt as enc
-import selenium.webdriver.chrome.service as services
 REGION = ''
 
 paydetails = OrderedDict(
@@ -59,6 +58,8 @@ class itemSel(QtWidgets.QMainWindow):
         self.setWindowIcon(QtGui.QIcon(getLoc('GUIS/icon.png')))
         self.label.setPixmap(QtGui.QPixmap(getLoc('GUIS/title.png')))
         self.strictItemSelect = True
+        self.skipIfSoldOut = False
+        self.nextAvailable = False
         p = self.palette()
         p.setColor(self.backgroundRole(), QtCore.Qt.white)
         self.setPalette(p)
@@ -73,16 +74,27 @@ class itemSel(QtWidgets.QMainWindow):
                                    "QMenuBar { background-color: rgb(226, 226, 226);}")
         optMenu = self.menubar.addMenu('Options')
         proxyMenu = self.menubar.addMenu('Proxy')
+
         self.useProxyS = QtWidgets.QAction("Use proxy", self, checkable=True)
         changeProxy = QtWidgets.QAction("Proxy Settings", self, checkable=False)
         changeProxy.triggered.connect(self.openProxy)
         self.useProxyS.triggered.connect(self.setProxy)
         proxyMenu.addAction(self.useProxyS)
         proxyMenu.addAction(changeProxy)
+
         strictAct = QtWidgets.QAction('Strict item selection', self, checkable=True)
         strictAct.triggered.connect(self.strict)
         strictAct.setChecked(True)
+
+        self.skipOut = QtWidgets.QAction('Skip if sold out', self, checkable=True)
+        self.skipOut.triggered.connect(self.skip)
+
+        self.nextSize = QtWidgets.QAction('Next available size if sold out', self, checkable=True)
+        self.nextSize.triggered.connect(self.nextSizeF)
+
         optMenu.addAction(strictAct)
+        optMenu.addAction(self.skipOut)
+        optMenu.addAction(self.nextSize)
 
     def setProxy(self):
         self.useProxy = not self.useProxy
@@ -111,13 +123,28 @@ class itemSel(QtWidgets.QMainWindow):
     def strict(self):
         self.strictItemSelect = not self.strictItemSelect
 
+    def skip(self):
+        self.skipIfSoldOut = not self.skipIfSoldOut
+        self.skipOut.setChecked(self.skipIfSoldOut)
+        if self.skipIfSoldOut and self.nextAvailable:
+            self.nextSizeF()
+            self.warnStatus('Can\'t use both "sold out" options')
+
+    def nextSizeF(self):
+        self.nextAvailable = not self.nextAvailable
+        self.nextSize.setChecked(self.nextAvailable)
+        if self.nextAvailable and self.skipIfSoldOut:
+            self.skip()
+            self.warnStatus('Can\'t use both "sold out" options')
+
     def go(self):
         itemdets = []
         for x in range(0, len(self.ui.item_list)):
             text = ast.literal_eval(self.ui.item_list.item(x).text())
             itemdets.append(text)
         time = self.ui.time.time().toString()
-        bot.openChrome(paydetails, itemdets, time, self.strictItemSelect, service, capabilities, self.useProxy, newProxy.selected_ip)
+        bot.openChrome(paydetails, itemdets, time, self.strictItemSelect, self.skipIfSoldOut, self.nextAvailable,
+                       service, capabilities, self.useProxy, newProxy.selected_ip)
 
     def removeItem(self):
         if self.ui.item_list.currentRow() != -1:
@@ -403,7 +430,7 @@ class config(QtWidgets.QMainWindow):
         self.ui.ASIA_btn.setEnabled(False)
         self.findFiles()
 
-        u = update.updateManager('https://github.com/danielyc/csb', '3.0.11')
+        u = update.updateManager('https://github.com/danielyc/csb', '3.0.12')
         if u.update:
             QtWidgets.QMessageBox.about(self, 'Update available', 'There is an update available, please download the latest version from the website.')
 
